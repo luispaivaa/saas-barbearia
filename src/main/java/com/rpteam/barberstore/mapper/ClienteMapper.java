@@ -13,14 +13,15 @@ public class ClienteMapper {
             return null;
         }
 
-        return Cliente.builder()
-                .email(dto.getEmail())
-                .senhaCriptografada(dto.getSenha())
-                .nome(dto.getNome())
-                .telefone(dto.getTelefone())
-                .aceiteTermosLGPD(dto.getAceiteTermosLGPD())
-                .ativo(true)
-                .build();
+        Cliente cliente = new Cliente();
+        cliente.setEmail(dto.getEmail());
+        cliente.setSenhaCriptografada(dto.getSenha());
+        cliente.setNome(dto.getNome());
+        cliente.setTelefone(dto.getTelefone());
+        cliente.setAceiteTermosLGPD(dto.getAceiteTermosLGPD());
+        cliente.setAtivo(true);
+
+        return cliente;
     }
 
     public ClienteResponseDTO toClienteResponseDTO(Cliente entity) {
@@ -28,16 +29,17 @@ public class ClienteMapper {
             return null;
         }
 
-        return ClienteResponseDTO.builder()
-                .id(entity.getId())
-                .email(entity.getEmail())
-                .dataCriacao(entity.getDataCriacao())
-                .dataAtualizacao(entity.getDataAtualizacao())
-                .ativo(entity.getAtivo())
-                .nome(entity.getNome())
-                .telefone(entity.getTelefone())
-                .aceiteTermosLGPD(entity.getAceiteTermosLGPD())
-                .build();
+        ClienteResponseDTO dto = new ClienteResponseDTO();
+        dto.setId(entity.getId());
+        dto.setEmail(entity.getEmail());
+        dto.setDataCriacao(entity.getDataCriacao());
+        dto.setDataAtualizacao(entity.getDataAtualizacao());
+        dto.setAtivo(entity.getAtivo());
+        dto.setNome(entity.getNome());
+        dto.setTelefone(entity.getTelefone());
+        dto.setAceiteTermosLGPD(entity.getAceiteTermosLGPD());
+
+        return dto;
     }
 
     public void updateClienteFromDTO(ClienteRequestDTO dto, Cliente entity) {
