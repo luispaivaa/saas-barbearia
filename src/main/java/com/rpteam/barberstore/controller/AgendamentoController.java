@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ public class AgendamentoController {
      * POST /api/agendamentos
      */
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('CLIENTE', 'ADMIN')")
     public ResponseEntity<AgendamentoResponseDTO> agendar(@Valid @RequestBody AgendamentoRequestDTO dto) {
         AgendamentoResponseDTO resposta = agendamentoService.agendarServico(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
@@ -35,6 +37,7 @@ public class AgendamentoController {
      * GET /api/agendamentos/barbeiro/{barbeiroId}
      */
     @GetMapping("/barbeiro/{barbeiroId}")
+    @PreAuthorize("hasAnyAuthority('BARBEIRO', 'ADMIN')")
     public ResponseEntity<List<AgendamentoResponseDTO>> listarAgendamentosDoBarbeiro(@PathVariable Long barbeiroId) {
         List<AgendamentoResponseDTO> resposta = agendamentoService.listarAgendamentosPorBarbeiro(barbeiroId);
         return ResponseEntity.ok(resposta);
@@ -45,6 +48,7 @@ public class AgendamentoController {
      * GET /api/agendamentos/barbeiro/{barbeiroId}/data?data=30/05/2026
      */
     @GetMapping("/barbeiro/{barbeiroId}/data")
+    @PreAuthorize("hasAnyAuthority('BARBEIRO', 'CLIENTE', 'ADMIN')")
     public ResponseEntity<List<AgendamentoResponseDTO>> listarAgendamentosDoBarbeiroEData(
             @PathVariable Long barbeiroId,
             @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate data) {
@@ -57,6 +61,7 @@ public class AgendamentoController {
      * GET /api/agendamentos/cliente/{clienteId}
      */
     @GetMapping("/cliente/{clienteId}")
+    @PreAuthorize("hasAnyAuthority('CLIENTE', 'ADMIN')")
     public ResponseEntity<List<AgendamentoResponseDTO>> listarAgendamentosDoCliente(@PathVariable Long clienteId) {
         List<AgendamentoResponseDTO> resposta = agendamentoService.listarAgendamentosCliente(clienteId);
         return ResponseEntity.ok(resposta);
@@ -67,6 +72,7 @@ public class AgendamentoController {
      * GET /api/agendamentos/{id}
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('CLIENTE', 'BARBEIRO', 'ADMIN')")
     public ResponseEntity<AgendamentoResponseDTO> obterPorId(@PathVariable Long id) {
         AgendamentoResponseDTO resposta = agendamentoService.obterPorId(id);
         return ResponseEntity.ok(resposta);
@@ -77,8 +83,20 @@ public class AgendamentoController {
      * DELETE /api/agendamentos/{id}
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('CLIENTE', 'BARBEIRO', 'ADMIN')")
     public ResponseEntity<Void> cancelarAgendamento(@PathVariable Long id) {
         agendamentoService.cancelarAgendamento(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Concluir um agendamento.
+     * PATCH /api/agendamentos/{id}/status
+     */
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAuthority('BARBEIRO')")
+    public ResponseEntity<AgendamentoResponseDTO> concluirAgendamento(@PathVariable Long id) {
+        AgendamentoResponseDTO resposta = agendamentoService.concluirAgendamento(id);
+        return ResponseEntity.ok(resposta);
     }
 }

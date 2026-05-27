@@ -41,9 +41,9 @@ public class AgendamentoMapper {
 
         return AgendamentoResponseDTO.builder()
                 .id(entity.getId())
-                .cliente(clienteMapper.toClienteResponseDTO(entity.getCliente()))
-                .barbeiro(barbeiroMapper.toBarbeiroResponseDTO(entity.getBarbeiro()))
-                .servico(servicoMapper.toServicoResponseDTO(entity.getServico()))
+                .cliente(clienteMapper.toResponseDTO(entity.getCliente()))
+                .barbeiro(barbeiroMapper.toResponseDTO(entity.getBarbeiro()))
+                .servico(servicoMapper.toResponseDTO(entity.getServico()))
                 .dataAgendada(entity.getDataAgendada())
                 .horaAgendada(entity.getHoraAgendada())
                 .status(entity.getStatus())

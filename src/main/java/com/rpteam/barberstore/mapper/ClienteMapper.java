@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ClienteMapper {
 
-    public Cliente toClienteEntity(ClienteRequestDTO dto) {
+    public Cliente toEntity(ClienteRequestDTO dto) {
         if (dto == null) {
             return null;
         }
@@ -24,7 +24,7 @@ public class ClienteMapper {
         return cliente;
     }
 
-    public ClienteResponseDTO toClienteResponseDTO(Cliente entity) {
+    public ClienteResponseDTO toResponseDTO(Cliente entity) {
         if (entity == null) {
             return null;
         }
