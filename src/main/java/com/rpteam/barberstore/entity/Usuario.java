@@ -25,6 +25,9 @@ public abstract class Usuario {
     @Column(nullable = false)
     private String senhaCriptografada;
 
+    @Column(nullable = false)
+    private String tipo; // CLIENTE, BARBEIRO, ADMIN
+
     @Column(name = "data_criacao", nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
 

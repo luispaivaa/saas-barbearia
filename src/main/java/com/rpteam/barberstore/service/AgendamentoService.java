@@ -76,15 +76,11 @@ public class AgendamentoService {
         return agendamentoMapper.toAgendamentoResponseDTO(salvo);
     }
 
-    /**
-     * HU2: Como barbeiro, gostaria de ver todos os meus agendamentos para saber como será minha rotina.
-     */
     @Transactional(readOnly = true)
     public List<AgendamentoResponseDTO> listarAgendamentosPorBarbeiro(Long barbeiroId) {
         validarBarbeiro(barbeiroId);
 
         return agendamentoRepository.findByBarbeiroId(barbeiroId).stream()
-                .filter(a -> a.getStatus() == StatusAgendamento.AGENDADO)
                 .map(agendamentoMapper::toAgendamentoResponseDTO)
                 .collect(Collectors.toList());
     }
@@ -97,9 +93,15 @@ public class AgendamentoService {
         validarBarbeiro(barbeiroId);
 
         return agendamentoRepository.findByBarbeiroIdAndData(barbeiroId, data).stream()
-                .filter(a -> a.getStatus() == StatusAgendamento.AGENDADO)
                 .map(agendamentoMapper::toAgendamentoResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<AgendamentoResponseDTO> buscarPorBarbeiroEData(Long barbeiroId, String data) {
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        java.time.LocalDate localDate = java.time.LocalDate.parse(data, formatter);
+        return listarAgendamentosPorBarbeiroEData(barbeiroId, localDate);
     }
 
     @Transactional(readOnly = true)
@@ -109,7 +111,6 @@ public class AgendamentoService {
         }
 
         return agendamentoRepository.findByClienteId(clienteId).stream()
-                .filter(a -> a.getStatus() == StatusAgendamento.AGENDADO)
                 .map(agendamentoMapper::toAgendamentoResponseDTO)
                 .collect(Collectors.toList());
     }
@@ -130,6 +131,18 @@ public class AgendamentoService {
 
         agendamento.setStatus(StatusAgendamento.CANCELADO);
         agendamentoRepository.save(agendamento);
+    }
+
+    @Transactional
+    public AgendamentoResponseDTO concluirAgendamento(Long id) {
+        Agendamento agendamento = agendamentoRepository.findById(id)
+                .orElseThrow(() -> new RegraNegocioException(
+                        "Agendamento com ID " + id + " não encontrado"));
+
+        agendamento.setStatus(StatusAgendamento.CONCLUIDO);
+        Agendamento salvo = agendamentoRepository.save(agendamento);
+        
+        return agendamentoMapper.toAgendamentoResponseDTO(salvo);
     }
 
     /**

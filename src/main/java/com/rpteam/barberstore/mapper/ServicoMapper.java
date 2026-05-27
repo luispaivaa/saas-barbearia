@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServicoMapper {
 
-    public Servico toServicoEntity(ServicoRequestDTO dto) {
+    public Servico toEntity(ServicoRequestDTO dto) {
         if (dto == null) {
             return null;
         }
@@ -21,7 +21,7 @@ public class ServicoMapper {
                 .build();
     }
 
-    public ServicoResponseDTO toServicoResponseDTO(Servico entity) {
+    public ServicoResponseDTO toResponseDTO(Servico entity) {
         if (entity == null) {
             return null;
         }

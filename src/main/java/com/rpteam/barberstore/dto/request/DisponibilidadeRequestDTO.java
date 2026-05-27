@@ -1,6 +1,9 @@
 package com.rpteam.barberstore.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.rpteam.barberstore.config.LocalDateDeserializer;
+import com.rpteam.barberstore.config.LocalTimeDeserializer;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,13 +24,16 @@ public class DisponibilidadeRequestDTO {
 
     @NotNull(message = "Data de trabalho não pode ser nula")
     @JsonFormat(pattern = "dd/MM/yyyy")
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate dataTrabalho;
 
     @NotNull(message = "Horário de início não pode ser nulo")
     @JsonFormat(pattern = "HH:mm:ss")
+    @JsonDeserialize(using = LocalTimeDeserializer.class)
     private LocalTime horarioInicio;
 
     @NotNull(message = "Horário de fim não pode ser nulo")
     @JsonFormat(pattern = "HH:mm:ss")
+    @JsonDeserialize(using = LocalTimeDeserializer.class)
     private LocalTime horarioFim;
 }

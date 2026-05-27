@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BarbeiroMapper {
 
-    public Barbeiro toBarbeiroEntity(BarbeiroRequestDTO dto) {
+    public Barbeiro toEntity(BarbeiroRequestDTO dto) {
         if (dto == null) {
             return null;
         }
@@ -24,7 +24,7 @@ public class BarbeiroMapper {
         return barbeiro;
     }
 
-    public BarbeiroResponseDTO toBarbeiroResponseDTO(Barbeiro entity) {
+    public BarbeiroResponseDTO toResponseDTO(Barbeiro entity) {
         if (entity == null) {
             return null;
         }
