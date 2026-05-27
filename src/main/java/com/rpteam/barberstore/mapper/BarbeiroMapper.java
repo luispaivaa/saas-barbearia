@@ -13,14 +13,15 @@ public class BarbeiroMapper {
             return null;
         }
 
-        return Barbeiro.builder()
-                .email(dto.getEmail())
-                .senhaCriptografada(dto.getSenha())
-                .nome(dto.getNome())
-                .telefone(dto.getTelefone())
-                .descricao(dto.getDescricao())
-                .ativo(true)
-                .build();
+        Barbeiro barbeiro = new Barbeiro();
+        barbeiro.setEmail(dto.getEmail());
+        barbeiro.setSenhaCriptografada(dto.getSenha());
+        barbeiro.setNome(dto.getNome());
+        barbeiro.setTelefone(dto.getTelefone());
+        barbeiro.setDescricao(dto.getDescricao());
+        barbeiro.setAtivo(true);
+
+        return barbeiro;
     }
 
     public BarbeiroResponseDTO toBarbeiroResponseDTO(Barbeiro entity) {
@@ -28,17 +29,18 @@ public class BarbeiroMapper {
             return null;
         }
 
-        return BarbeiroResponseDTO.builder()
-                .id(entity.getId())
-                .email(entity.getEmail())
-                .dataCriacao(entity.getDataCriacao())
-                .dataAtualizacao(entity.getDataAtualizacao())
-                .ativo(entity.getAtivo())
-                .nome(entity.getNome())
-                .telefone(entity.getTelefone())
-                .descricao(entity.getDescricao())
-                .classificacaoMedia(entity.getClassificacaoMedia())
-                .build();
+        BarbeiroResponseDTO dto = new BarbeiroResponseDTO();
+        dto.setId(entity.getId());
+        dto.setEmail(entity.getEmail());
+        dto.setDataCriacao(entity.getDataCriacao());
+        dto.setDataAtualizacao(entity.getDataAtualizacao());
+        dto.setAtivo(entity.getAtivo());
+        dto.setNome(entity.getNome());
+        dto.setTelefone(entity.getTelefone());
+        dto.setDescricao(entity.getDescricao());
+        dto.setClassificacaoMedia(entity.getClassificacaoMedia());
+
+        return dto;
     }
 
     public void updateBarbeiroFromDTO(BarbeiroRequestDTO dto, Barbeiro entity) {

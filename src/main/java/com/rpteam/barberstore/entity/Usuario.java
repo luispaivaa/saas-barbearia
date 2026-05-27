@@ -2,7 +2,6 @@ package com.rpteam.barberstore.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +13,6 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public abstract class Usuario {
 
     @Id
@@ -34,7 +32,6 @@ public abstract class Usuario {
     private LocalDateTime dataAtualizacao;
 
     @Column(nullable = false)
-    @Builder.Default
     private Boolean ativo = true;
 
     @PrePersist
@@ -52,3 +49,4 @@ public abstract class Usuario {
         return this.senhaCriptografada.equals(senha);
     }
 }
+
