@@ -213,4 +213,23 @@ public class AgendamentoService {
             throw new RegraNegocioException("Barbeiro com ID " + barbeiroId + " não encontrado");
         }
     }
+
+    @Transactional(readOnly = true)
+    public String gerarRelatorioCsv() {
+        List<Agendamento> agendamentos = agendamentoRepository.findAll();
+        StringBuilder csv = new StringBuilder();
+        csv.append("ID,Cliente,Barbeiro,Servico,Data,Hora,Status\n");
+
+        for (Agendamento a : agendamentos) {
+            csv.append(String.format("%d,%s,%s,%s,%s,%s,%s\n",
+                    a.getId(),
+                    a.getCliente().getNome(),
+                    a.getBarbeiro().getNome(),
+                    a.getServico().getNome(),
+                    a.getDataAgendada(),
+                    a.getHoraAgendada(),
+                    a.getStatus()));
+        }
+        return csv.toString();
+    }
 }

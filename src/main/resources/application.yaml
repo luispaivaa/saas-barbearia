@@ -3,18 +3,13 @@ spring:
     name: barbers
 
   datasource:
-    url: jdbc:h2:mem:barbers
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:barbers}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     properties:
@@ -26,7 +21,7 @@ spring:
 
 app:
   jwt:
-    secret: mySecretKeyThatIsAtLeast256BitsLongForHS256AlgorithmRequirements123456789012
+    secret: ${JWT_SECRET}
     expiration: 86400000 # 24 hours in milliseconds
 
 logging:
@@ -35,3 +30,12 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 server:
   port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,metrics"
+  endpoint:
+    health:
+      show-details: always
