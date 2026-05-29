@@ -6,6 +6,7 @@ import { Calendar, Clock, MapPin, Scissors, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { formatDateLong, getDateSortValue } from '../utils/dateFormatter';
+import { agendamentoService } from '../services/agendamentoService';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,14 +37,8 @@ export function MeusHorarios() {
   useEffect(() => {
     const fetchAgendamentos = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/api/agendamentos/cliente/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!response.ok) throw new Error('Erro ao buscar agendamentos');
-        const data = await response.json();
-        setAgendamentos(data);
+        const response = await agendamentoService.listarPorCliente(userId);
+        setAgendamentos(response.data);
       } catch (error) {
         toast.error('Erro ao carregar agendamentos');
         console.error(error);
@@ -57,14 +52,7 @@ export function MeusHorarios() {
 
   const handleCancelar = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/agendamentos/${id}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) throw new Error('Erro ao cancelar agendamento');
+      await agendamentoService.cancelar(id);
 
       setAgendamentos(agendamentos.filter(ag => ag.id !== id));
       toast.success('Agendamento cancelado com sucesso');

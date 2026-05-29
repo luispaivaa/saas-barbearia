@@ -8,6 +8,8 @@ import { Separator } from '../components/ui/separator';
 import { User, Mail, Phone, Lock, Camera, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
+import { clienteService } from '../services/clienteService';
+import { barbeiroService } from '../services/barbeiroService';
 
 interface ClienteData {
   id: number;
@@ -22,7 +24,7 @@ export function MeuPerfil() {
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   
-  const apiEndpoint = role === 'BARBEIRO' ? 'barbeiros' : 'clientes';
+  const isBarber = role === 'BARBEIRO';
 
   const [formData, setFormData] = useState<ClienteData>({
     id: 0,
@@ -46,17 +48,11 @@ export function MeuPerfil() {
       }
 
       try {
-        const response = await fetch(`http://localhost:8080/api/${apiEndpoint}/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = isBarber 
+          ? await barbeiroService.obter(userId)
+          : await clienteService.obter(userId);
 
-        if (!response.ok) {
-          throw new Error(`Erro ao buscar dados do ${role?.toLowerCase()}`);
-        }
-
-        const data = await response.json();
+        const data = response.data;
         setFormData({
           id: data.id,
           nome: data.nome,
@@ -72,7 +68,7 @@ export function MeuPerfil() {
     };
 
     fetchUserData();
-  }, [userId, token, apiEndpoint, role]);
+  }, [userId, token, isBarber]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -91,7 +87,7 @@ export function MeuPerfil() {
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (role === 'BARBEIRO') {
+    if (isBarber) {
       if (!formData.nome || !formData.email || !formData.telefone) {
         toast.error('Preencha todos os campos');
         return;
@@ -105,7 +101,7 @@ export function MeuPerfil() {
 
     try {
       const payload =
-        role === 'BARBEIRO'
+        isBarber
           ? {
               nome: formData.nome,
               email: formData.email,
@@ -119,24 +115,10 @@ export function MeuPerfil() {
 
       console.log('Payload atualizar perfil:', payload);
 
-      const response = await fetch(`http://localhost:8080/api/${apiEndpoint}/${formData.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        let errorMessage = 'Erro ao atualizar perfil';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch {
-          errorMessage = `Erro ao atualizar perfil (${response.status})`;
-        }
-        throw new Error(errorMessage);
+      if (isBarber) {
+        await barbeiroService.atualizar(formData.id, payload);
+      } else {
+        await clienteService.atualizar(formData.id, payload);
       }
 
       // UX: Atualizar contexto global para mudar nome/email no Header instantaneamente
@@ -173,27 +155,10 @@ export function MeuPerfil() {
     setLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:8080/api/${apiEndpoint}/${formData.id}/alterar-senha`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          senhaAtual: senhaData.senhaAtual,
-          novaSenha: senhaData.novaSenha,
-        }),
-      });
-
-      if (!response.ok) {
-        let errorMessage = 'Erro ao alterar senha';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch {
-          errorMessage = `Erro ao alterar senha (${response.status})`;
-        }
-        throw new Error(errorMessage);
+      if (isBarber) {
+        await barbeiroService.alterarSenha(formData.id, senhaData.senhaAtual, senhaData.novaSenha);
+      } else {
+        await clienteService.alterarSenha(formData.id, senhaData.senhaAtual, senhaData.novaSenha);
       }
 
       toast.success('Senha alterada com sucesso!');
