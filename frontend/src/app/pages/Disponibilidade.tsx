@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { formatDateShort, getDateSortValue } from '../utils/dateFormatter';
 import api from '../services/api';
+import { disponibilidadeService } from '../services/disponibilidadeService';
 
 interface Disponibilidade {
   id: number;
@@ -32,14 +33,8 @@ export function Disponibilidade() {
   useEffect(() => {
     const fetchDisponibilidades = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/api/disponibilidades/barbeiro/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!response.ok) throw new Error('Erro ao buscar disponibilidades');
-        const data = await response.json();
-        setDisponibilidades(data);
+        const response = await disponibilidadeService.listarPorBarbeiro(userId);
+        setDisponibilidades(response.data);
       } catch (error) {
         toast.error('Erro ao carregar disponibilidades');
         console.error(error);
@@ -69,15 +64,12 @@ export function Disponibilidade() {
       const [year, month, day] = novaData.split('-');
       const dataFormatada = `${day}/${month}/${year}`;
 
-      const disponibilidadeData = {
-        barbeiroId: userId,
-        dataTrabalho: dataFormatada,
-        horarioInicio: `${novoInicio}:00`,
-        horarioFim: `${novoFim}:00`,
-      };
-
-      const response = await fetch('http://localhost:8080/api/disponibilidades', {
-        method: 'POST',
+      await disponibilidadeService.criar(
+        userId,
+        dataFormatada,
+        `${novoInicio}:00`,
+        `${novoFim}:00`
+      );
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -85,13 +77,13 @@ export function Disponibilidade() {
         body: JSON.stringify(disponibilidadeData),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao adicionar disponibilidade');
-      }
-
-      const novaDisponibilidade = await response.json();
-      setDisponibilidades([...disponibilidades, novaDisponibilidade]);
+      const novaDisp = await disponibilidadeService.criar(
+        userId,
+        dataFormatada,
+        `${novoInicio}:00`,
+        `${novoFim}:00`
+      );
+      setDisponibilidades([...disponibilidades, novaDisp.data]);
       toast.success('Disponibilidade adicionada!');
       
       // Reset form
@@ -107,10 +99,9 @@ export function Disponibilidade() {
   };
 
   const handleRemover = async (id: number) => {
-    // Estado temporário de carregamento para a UI (se desejar criar um overlay)
     const toastId = toast.loading('Removendo disponibilidade...');
     try {
-      await api.delete(`/disponibilidades/${id}`);
+      await disponibilidadeService.deletar(id);
       setDisponibilidades((prev) => prev.filter((d) => d.id !== id));
       toast.success('Disponibilidade removida com sucesso!', { id: toastId });
     } catch (error) {

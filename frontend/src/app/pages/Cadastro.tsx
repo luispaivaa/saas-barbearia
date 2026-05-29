@@ -7,6 +7,7 @@ import { Card } from '../components/ui/card';
 import { Toaster } from '../components/ui/sonner';
 import { Moon, Sun, Lock, Mail, User, Phone } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { clienteService } from '../services/clienteService';
 import { toast } from 'sonner';
 
 export function Cadastro() {
@@ -49,30 +50,12 @@ export function Cadastro() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/api/clientes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          nome: formData.nome,
-          email: formData.email,
-          telefone: formData.telefone,
-          senha: formData.password,
-          aceiteTermosLGPD: true,
-        }),
-      });
-
-      if (!response.ok) {
-        let errorMessage = 'Erro ao criar conta';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch {
-          errorMessage = `Erro ao criar conta (${response.status})`;
-        }
-        throw new Error(errorMessage);
-      }
+      await clienteService.criar(
+        formData.nome,
+        formData.email,
+        formData.telefone,
+        formData.password
+      );
 
       toast.success('Conta criada com sucesso!');
       navigate('/login');

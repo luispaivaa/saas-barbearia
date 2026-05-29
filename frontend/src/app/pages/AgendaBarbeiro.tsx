@@ -11,7 +11,8 @@ import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { parseBackendDate, formatSafe } from '../utils/dateFormatter';
-import api from '../services/api';
+import { agendamentoService } from '../services/agendamentoService';
+import { disponibilidadeService } from '../services/disponibilidadeService';
 
 interface Agendamento {
   id: number;
@@ -57,10 +58,8 @@ export function AgendaBarbeiro() {
       setLoading(true);
       try {
         // Busca Agendamentos
-        const resAgendamentos = await fetch(`http://localhost:8080/api/agendamentos/barbeiro/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const dataAg = await resAgendamentos.json();
+        const resAgendamentos = await agendamentoService.listarPorBarbeiro(userId);
+        const dataAg = resAgendamentos.data;
         const agendamentosDodia = dataAg.filter((ag: Agendamento) => {
           const parsedDate = parseBackendDate(ag.dataAgendada);
           return parsedDate ? isSameDay(parsedDate, dataSelecionada) : false;
@@ -69,7 +68,7 @@ export function AgendaBarbeiro() {
 
         // 2. Missão 2: Busca da Disponibilidade para o dia selecionado
         try {
-          const resDisp = await api.get(`/disponibilidades/barbeiro/${userId}`);
+          const resDisp = await disponibilidadeService.listarPorBarbeiro(userId);
           const listaDisp = Array.isArray(resDisp.data) ? resDisp.data : resDisp.data.content || [];
           
           const dispHoje = listaDisp.find((d: any) => {
