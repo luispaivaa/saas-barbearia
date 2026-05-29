@@ -6,6 +6,7 @@ import com.rpteam.barberstore.service.AgendamentoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -98,5 +99,16 @@ public class AgendamentoController {
     public ResponseEntity<AgendamentoResponseDTO> concluirAgendamento(@PathVariable Long id) {
         AgendamentoResponseDTO resposta = agendamentoService.concluirAgendamento(id);
         return ResponseEntity.ok(resposta);
+    }
+
+    @GetMapping("/relatorio/csv")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<String> baixarRelatorioCsv() {
+        String csvData = agendamentoService.gerarRelatorioCsv();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio.csv")
+                .header(HttpHeaders.CONTENT_TYPE, "text/csv; charset=UTF-8")
+                .body(csvData);
     }
 }
